@@ -49,6 +49,25 @@ class Segment:
         else:
             raise NotImplementedError
 
+    def normal(self):
+        x1 = self.y
+        y1 = self.x + self.vector.x
+        y2 = self.x
+        x2 = self.y + self.vector.y
+
+        normal = Vector2(x2-x1, y2-y1)
+        unit_normal = normal.normalize()
+
+        center = self.center()
+
+        return Segment(center.point, unit_normal)
+
+    def center(self):
+        x_center = (self.x + self.x + self.vector.x) / 2
+        y_center = (self.y + self.y + self.vector.y) / 2
+
+        return Point(Vector2(x_center, y_center))
+
     @property
     def x(self):
         return self.point.x

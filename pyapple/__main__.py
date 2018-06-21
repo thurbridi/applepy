@@ -58,6 +58,8 @@ if __name__ == '__main__':
         c2 = Circle(Vector2(300, 400), 100)
         p1 = Point(Vector2(300, 150))
         seg1 = Segment(Vector2(100, 100), Vector2(400, 256))
+        segN = seg1.normal()
+        # seg1_center = seg1.center()
 
         screen.lock()
         screen.fill(BLACK)
@@ -66,6 +68,8 @@ if __name__ == '__main__':
         c2.draw(screen)
         p1.draw(screen)
         seg1.draw(screen)
+        segN.draw(screen, color=RED)
+        # seg1_center.draw(screen)
 
         if (c1.segment_collision(seg1) or
                 c1.circle_collision(c2) or c1.point_collision(p1)):
