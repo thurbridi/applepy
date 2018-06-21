@@ -52,28 +52,17 @@ if __name__ == '__main__':
             if event.type == pygame.QUIT:
                 done = True
 
-        c1_pos = m_pos
-
-        c1 = Circle(c1_pos, 50)
-        c2 = Circle(Vector2(300, 400), 100)
-        p1 = Point(Vector2(300, 150))
-        seg1 = Segment(Vector2(100, 100), Vector2(400, 256))
-        segN = seg1.normal()
-        # seg1_center = seg1.center()
+        seg1 = Segment(Vector2(100, 100), Vector2(180, 256))
+        seg2 = Segment(m_pos, Vector2(300, 175) - m_pos)
 
         screen.lock()
         screen.fill(BLACK)
 
-        c1.draw(screen)
-        c2.draw(screen)
-        p1.draw(screen)
         seg1.draw(screen)
-        segN.draw(screen, color=RED)
-        # seg1_center.draw(screen)
+        seg2.draw(screen, color=RED)
 
-        if (c1.segment_collision(seg1) or
-                c1.circle_collision(c2) or c1.point_collision(p1)):
-            c1.draw(screen, color=RED)
+        if seg1.intersection(seg2):
+            seg1.intersection(seg2).draw(screen)
 
         screen.unlock()
         pygame.display.flip()

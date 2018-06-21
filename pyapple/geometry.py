@@ -68,6 +68,60 @@ class Segment:
 
         return Point(Vector2(x_center, y_center))
 
+    def intersection(self, other):
+        x1 = self.x
+        y1 = self.y
+        x2 = self.x + self.vector.x
+        y2 = self.y + self.vector.y
+
+        x3 = other.x
+        y3 = other.y
+        x4 = other.x + other.vector.x
+        y4 = other.y + other.vector.y
+
+        a1 = y2 - y1
+        b1 = x1 - x2
+        c1 = (x2 * y1) - (x1 * y2)
+
+        r3 = ((a1 * x3) + (b1 * y3) + c1)
+        r4 = ((a1 * x4) + (b1 * y4) + c1)
+
+        same_sign = ((r3 > 0 and r4 > 0) or (r3 < 0 and r4 < 0))
+        if r3 != 0 and r4 != 0 and same_sign:
+            return False
+
+        a2 = y4 - y3
+        b2 = x3 - x4
+        c2 = (x4 * y3) - (x3 * y4)
+
+        r1 = ((a2 * x1) + (b2 * y1) + c2)
+        r2 = ((a2 * x2) + (b2 * y2) + c2)
+
+        same_sign = ((r1 > 0 and r2 > 0) or (r1 < 0 and r2 < 0))
+        if r1 != 0 and r2 != 0 and same_sign:
+            return False
+
+        denom = (a1 * b2) - (a2 * b1)
+        if denom == 0:
+            # Colinear
+            return False
+
+        offset = abs(denom) / 2
+
+        num = (b1 * c2) - (b2 * c1)
+        if num < 0:
+            int_x = (num - offset) / denom
+        else:
+            int_x = (num + offset) / denom
+
+        num = (a2 * c1) - (a1 * c2)
+        if num < 0:
+            int_y = (num - offset) / denom
+        else:
+            int_y = (num + offset) / denom
+
+        return Point(Vector2(int_x, int_y))
+
     @property
     def x(self):
         return self.point.x
