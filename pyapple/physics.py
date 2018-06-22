@@ -1,58 +1,84 @@
-class Environment:
-    def __init__(self, gravity, boundries):
-        self._gravity = gravity
-        self.boundries = boundries
+from pygame.math import Vector2
+import math
 
 
-class Solid:
-    def __init__(self, shape, velocity=0, acceleration=0, mass=0):
-        self._shape = shape
-        self._velocity = velocity
-        self._acceleration = acceleration
-        self._mass = mass
+class Body:
+    def __init__(self,
+                 shape,
+                 velocity=Vector2(0, 0),
+                 acceleration=Vector2(0, 0),
+                 restituition=0.2,
+                 density=5.0):
+        self.shape = shape
+        self.vel = velocity
+        self.acc = acceleration
+        self.restituition = restituition
+        self.inv_mass = 1.0 / shape.mass(density)
 
-    def move(self, dtime):
-        ...
+    def apply_force(self, force):
+        self.acc += force
+
+    def apply_impulse(self, impulse):
+        self.vel += self.inv_mass * impulse
+
+    @property
+    def position(self):
+        return self.shape.point
+
+    @position.setter
+    def position(self, value):
+        self.shape.point = value
 
     @property
     def x(self):
-        return self._shape.x
-
-    @x.setter
-    def x(self, value):
-        self._shape.x(value)
+        return self.shape.x
 
     @property
     def y(self):
-        return self._shape.y
-
-    @y.setter
-    def y(self, value):
-        self._shape.y(value)
-
-    @property
-    def shape(self):
-        return self._shape
+        return self.shape.y
 
     @property
     def mass(self):
-        return self.mass
+        return 1 / self._mass
 
-    @property
-    def velocity(self):
-        return self.velocity
 
-    @velocity.setter
-    def velocity(self, value):
-        self._velocity = value
+class Collision:
+    @classmethod
+    def circle_to_circle(cls, manifold, a, b):
+        normal = b.position - a.position
+        dist_sqr = normal.length() ** 2
+        radius = a.shape.radius + b.shape.radius
 
-    @property
-    def acceleration(self):
-        return self.acceleration
+        # No collision
+        if dist_sqr >= radius * radius:
+            manifold.contact_count = 0
+            return
 
-    @acceleration.setter
-    def acceleration(self, value):
-        self._acceleration = value
+        distance = math.sqrt(dist_sqr)
+        manifold.contact_count = 1
 
-    def display(self, screen):
-        self._shape.display(screen)
+        if distance == 0:
+            manifold.penetration = a.shape.radius
+            manifold.normal = Vector2(1, 0)
+            manifold.contacts[0] = a.position
+        else:
+            manifold.penetration = radius - distance
+            manifold.normal = normal / distance
+            manifold.contacts[0] = manifold.normal * \
+                a.shape.radius + a.position
+
+    @classmethod
+    def circle_to_polygon(cls, manifold, a, b):
+        # a: circle
+        # b: polygon
+        ...
+
+    @classmethod
+    def polygon_to_circle(cls, manifold, a, b):
+        # a: polygon
+        # b: circle
+        Collision.circle_to_polygon(manifold, b, a)
+
+    @classmethod
+    def polygon_to_polygon(cls, manifold, a, b):
+        ...
