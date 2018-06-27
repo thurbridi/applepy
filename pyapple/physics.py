@@ -13,7 +13,8 @@ class Body:
         self.vel = velocity
         self.acc = acceleration
         self.restituition = restituition
-        self.inv_mass = 1.0 / shape.mass(density)
+        self.mass = shape.mass(density)
+        self.inv_mass = 1.0 / self.mass
 
     def apply_force(self, force):
         self.acc += force
@@ -37,16 +38,12 @@ class Body:
     def y(self):
         return self.shape.y
 
-    @property
-    def mass(self):
-        return 1 / self._mass
-
 
 class Collision:
     @classmethod
     def circle_to_circle(cls, manifold, a, b):
         normal = b.position - a.position
-        dist_sqr = normal.length() ** 2
+        dist_sqr = normal.length_squared()
         radius = a.shape.radius + b.shape.radius
 
         # No collision
@@ -60,12 +57,9 @@ class Collision:
         if distance == 0:
             manifold.penetration = a.shape.radius
             manifold.normal = Vector2(1, 0)
-            manifold.contacts[0] = a.position
         else:
             manifold.penetration = radius - distance
             manifold.normal = normal / distance
-            manifold.contacts[0] = manifold.normal * \
-                a.shape.radius + a.position
 
     @classmethod
     def circle_to_polygon(cls, manifold, a, b):

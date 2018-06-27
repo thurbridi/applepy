@@ -1,4 +1,5 @@
 from .physics import Collision
+from .geometry import Circle
 
 EPSILON = 0.0001
 
@@ -7,7 +8,6 @@ class Manifold:
     def __init__(self, body_a, body_b):
         self.body_a = body_a
         self.body_b = body_b
-        self.contacts = [None, None]
         self.contact_count = None
         self.penetration = None
         self.normal = None
@@ -24,11 +24,8 @@ class Manifold:
                 self.e = 0.0
 
     def solve(self):
-        shape_a = type(self.body_a.shape).__name__
-        shape_b = type(self.body_b.shape).__name__
-
-        if shape_a == 'Circle':
-            if shape_b == 'Circle':
+        if isinstance(self.body_a.shape, Circle):
+            if isinstance(self.body_b.shape, Circle):
                 Collision.circle_to_circle(self, self.body_a, self.body_b)
         else:
             raise NotImplementedError
